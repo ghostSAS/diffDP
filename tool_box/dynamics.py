@@ -1,5 +1,10 @@
-import autograd.numpy as np
+# import autograd.numpy as np
+import numpy as np
+import sympy
+from numba import jit, njit
+# from .utils import *
 
+@jit(nopython=True)
 def simple_pen(t,x,u, m=1, l=.5, b=.1):
     """ simple pendulum with single arm rotating around a single point
         b: damping factor
@@ -13,7 +18,13 @@ def simple_pen(t,x,u, m=1, l=.5, b=.1):
     
     return xdot
 
-
+def simple_pen_get_AB():
+    x = sympy.symbols('x1,x2')
+    u = sympy.symbols('u')
+    
+    sin = sympy.sin
+    
+    
 def cart_pen(t,x,u,M=.5,m=.2,l=.3,b=.1,I=.006):
     """ cart pendulum 
         model from: https://ctms.engin.umich.edu/CTMS/index.php?example=InvertedPendulum&section=SystemModeling
@@ -22,21 +33,18 @@ def cart_pen(t,x,u,M=.5,m=.2,l=.3,b=.1,I=.006):
     """
     # 
     g = 9.81
-    
     [xi1, xi2, xi3, xi4] = x
-    xi5 = u
-    cos = np.cos
-    sin = np.sin
+    xi5 = u[0]
     m1 = M
     m2 = m
     xdot  = np.array([xi3,
         xi4,
-        1/(m1+m2*(1-cos(xi2)**2))*(l*m2*sin(xi2)*xi4**2+xi5+m2*g*cos(xi2)*sin(xi2)),
-        -1/(l*m1+l*m2*(1-cos(xi2)**2))*(l*m2*cos(xi2)*sin(xi2)*(xi4)**2+xi5*cos(xi2)+(m1+m2)*g*sin(xi2))])
+        1/(m1+m2*(1-np.cos(xi2)**2))*(l*m2*np.sin(xi2)*xi4**2+xi5+m2*g*np.cos(xi2)*np.sin(xi2)),
+        -1/(l*m1+l*m2*(1-np.cos(xi2)**2))*(l*m2*np.cos(xi2)*np.sin(xi2)*(xi4)**2+xi5*np.cos(xi2)+(m1+m2)*g*np.sin(xi2))])
     
     return xdot
 
-
+@jit(nopython=True)
 def furuta_pen(t,x,u,m2=.127,l1=.2,l2=.3):
     j1 = 0.0012
     lc2 = 0.15
@@ -71,4 +79,5 @@ def furuta_pen(t,x,u,m2=.127,l1=.2,l2=.3):
     
     # return: ddt[arm1_theta, arm2_theta, arm1_rate, arm2_rate]
     return xdot
+    
     
