@@ -1,5 +1,5 @@
 import autograd.numpy as np
-# from numba import jit
+from numba import jit
 
 # @jit(nopython=True)
 def RK4(fun,x0,u,dt,*args):
