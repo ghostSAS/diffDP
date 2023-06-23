@@ -1,10 +1,10 @@
 # import autograd.numpy as np
 import numpy as np
-import sympy
+import sympy as sp
 from numba import jit, njit
 # from .utils import *
 
-@jit(nopython=True)
+# @jit(nopython=True)
 def simple_pen(t,x,u, m=1, l=.5, b=.1):
     """ simple pendulum with single arm rotating around a single point
         b: damping factor
@@ -13,22 +13,32 @@ def simple_pen(t,x,u, m=1, l=.5, b=.1):
     """
     g = 9.81
     
+    u = u[0]
+    
     xdot = np.array([x[1], 
                      (u-m*g*l*np.sin(x[0])-b*x[1])/m/l/l])
     
     return xdot
 
-def simple_pen_get_AB():
-    x = sympy.symbols('x1,x2')
-    u = sympy.symbols('u')
+def simple_pen_sym(dt,x,u, m=1, l=.5, b=.1):
+    """ simple pendulum in symbolic
+    """
+    g = 9.81
     
-    sin = sympy.sin
+    [xi1, xi2] = x
+    xi3 = u[0]
+    
+    xdot = sp.Array([xi2, 
+                     (xi3-m*g*l*sp.sin(xi1)-b*xi2)/m/l/l])
+    
+    return xdot
     
     
 def cart_pen(t,x,u,M=.5,m=.2,l=.3,b=.1,I=.006):
     """ cart pendulum 
         model from: https://ctms.engin.umich.edu/CTMS/index.php?example=InvertedPendulum&section=SystemModeling
-
+            -- downwards: theta = 0
+            -- upwards: theta = np.pi
         return: ddt[cart_position, arm_angle, cart_velocity, arm_rate]
     """
     # 
@@ -44,7 +54,26 @@ def cart_pen(t,x,u,M=.5,m=.2,l=.3,b=.1,I=.006):
     
     return xdot
 
-@jit(nopython=True)
+def cart_pen_sym(dt,x,u,M=.5,m=.2,l=.3,b=.1,I=.006):
+    """ cart pendulum 
+        model from: https://ctms.engin.umich.edu/CTMS/index.php?example=InvertedPendulum&section=SystemModeling
+
+        return: ddt[cart_position, arm_angle, cart_velocity, arm_rate]
+    """
+    # 
+    g = 9.81
+    [xi1, xi2, xi3, xi4] = x
+    xi5 = u[0]
+    m1 = M
+    m2 = m
+    xdot  = sp.Array([xi3,
+        xi4,
+        1/(m1+m2*(1-sp.cos(xi2)**2))*(l*m2*sp.sin(xi2)*xi4**2+xi5+m2*g*sp.cos(xi2)*sp.sin(xi2)),
+        -1/(l*m1+l*m2*(1-sp.cos(xi2)**2))*(l*m2*sp.cos(xi2)*sp.sin(xi2)*(xi4)**2+xi5*sp.cos(xi2)+(m1+m2)*g*sp.sin(xi2))])
+    
+    return xdot
+
+# @jit(nopython=True)
 def furuta_pen(t,x,u,m2=.127,l1=.2,l2=.3):
     j1 = 0.0012
     lc2 = 0.15
@@ -81,3 +110,11 @@ def furuta_pen(t,x,u,m2=.127,l1=.2,l2=.3):
     return xdot
     
     
+def unicycle(t,x,u):
+    theta = x[-1]
+    [v,w] = u
+    
+    xdot = np.array([v*np.cos(theta),
+                     v*np.sin(theta),
+                     w])
+    return xdot

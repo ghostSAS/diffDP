@@ -1,26 +1,22 @@
 # import path
 import sys
-sys.path.append('../')
+sys.path.append('.')
 
 import autograd.numpy as np
-import time as time
 
-from tool_box import *
-
-import visulization.static as vsta
-import visulization.animation as vani
-
-dynamics = cart_pen
+from CDDP import *
 
 
-# print(dyn.RK4(np.zeros(4),1,.01))
 
-finiteDiff(RK4,np.zeros(4),np.array([1]),.01,1e-4)
+dynS = Dynamics(num=2,dt=.01)
 
-# x = np.random.rand(4)
+@timer_decorator
+def evaluate_f_xu(dynS):
+    # print(dynS.f_x(np.random.rand(4), np.random.rand(1), .02))
+    # print(dynS.f_u(np.random.rand(4), np.random.rand(1), .02))
+    # print(dynS.f_dt(np.random.rand(4), np.random.rand(1), np.zeros(1)+.1))
+    print(dynS.f_dt(np.zeros(4)+1, np.zeros(1)+1, np.zeros(1)+.1))
+    
+f = evaluate_f_xu
+f(dynS)
 
-# u = np.array([1])
-# print(float(u))
-
-
-# print(np.append(x,u))

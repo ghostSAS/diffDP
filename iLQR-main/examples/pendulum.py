@@ -39,9 +39,9 @@ Pendulum = Dynamics.Discrete(f)
 x, u = GetSyms(n_x, n_u)
 #theta = 0 --> sin(theta) = 0, cos(theta) = 1
 x_goal = np.array([0, 1, 0])
-Q  = np.diag([0, 1, 0.1])
+Q  = np.diag([0, 1, 0.1])*0
 R  = np.diag([0.1])
-QT = np.diag([0, 100, 100])
+QT = np.diag([100, 100, 100])
 #Add constraints on torque input (2Nm to -2Nm)
 cons = Bounded(u, high = [2], low = [-2])
 SwingUpCost = Cost.QR(Q, R, QT, x_goal, cons)
@@ -63,6 +63,14 @@ xs, us, cost_trace = controller.fit(x0, us_init)
 import matplotlib.pyplot as plt
 theta = np.arctan2(xs[:, 0], xs[:, 1])
 theta = np.where(theta < 0, 2*np.pi+theta, theta)
+
+print(xs[-1,:])
+
+plt.figure(1)
 plt.plot(theta)
 plt.plot(us)
+
+plt.figure(2)
+plt.plot(cost_trace)
 plt.show()
+

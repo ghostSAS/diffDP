@@ -11,6 +11,8 @@ sys.path.append('.')
 
 from ilqr import *
 
+import matplotlib.pyplot as plt
+
 def vehicle_kinematics(state, action):
     px, py, heading, vel, steer = state
     accel, steer_vel = action
@@ -70,3 +72,13 @@ x0 = np.array([0, 1.5, 0, 1, 0,
 us_init = np.random.randn(N, n_u)*0.0001
 #get optimal states and actions
 xs, us, cost_trace = controller.fit(x0, us_init, 100)
+
+
+px1 = xs[:,5]
+py1 = xs[:,6]
+px2 = xs[:,0]
+py2 = xs[:,1]
+
+plt.plot(px1, py1)
+plt.plot(px2, py2)
+plt.show()
